@@ -46,6 +46,17 @@ function customExceptionHandler($exception) {
 }
 set_exception_handler("customExceptionHandler");
 
+function shutdownFunction() {
+    $error = error_get_last();
+    if ($error) {
+        error_log("Exception: " . $error['message'], 3, 'errors.log');
+        http_response_code(500);
+        echo json_encode(['body' => $error['message']]);
+        exit();
+    }
+}
+register_shutdown_function('shutdownFunction');
+
 function encrypt($data, $encryptionKey) {
     $ivLength = openssl_cipher_iv_length('AES-256-CBC');
     $iv = openssl_random_pseudo_bytes($ivLength);
