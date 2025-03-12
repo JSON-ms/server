@@ -1,2 +1,2 @@
 INSERT INTO users (google_id, name, email, avatar)
-VALUES (?, ?, ?, ?)
+VALUES (:google_id, :name, :email, :avatar)

@@ -1,2 +1,2 @@
 DELETE FROM permissions
-WHERE interface_uuid = ?
+WHERE interface_uuid = :uuid

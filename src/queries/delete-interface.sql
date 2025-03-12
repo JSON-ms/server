@@ -1,3 +1,3 @@
 DELETE FROM interfaces
-WHERE uuid = ?
-    AND created_by = ?
+WHERE uuid = :uuid
+    AND created_by = :userId

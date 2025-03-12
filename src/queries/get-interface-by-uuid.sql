@@ -9,11 +9,5 @@ FROM interfaces AS i
     LEFT JOIN permissions AS pa ON pa.interface_uuid = i.uuid AND pa.type = 'admin'
     LEFT JOIN permissions AS pi ON pi.interface_uuid = i.uuid AND pi.type = 'interface'
 WHERE i.uuid = :uuid
-  AND (i.created_by = :userId OR EXISTS (
-    SELECT 1
-    FROM permissions AS p
-        JOIN users AS up ON up.email = p.email
-    WHERE p.interface_uuid = i.uuid AND up.id = :userId
-))
 GROUP BY
     i.uuid, u.name;

@@ -1,3 +1,3 @@
 SELECT *
 FROM users 
-WHERE google_id = ?
+WHERE google_id = :id
