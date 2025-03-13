@@ -36,7 +36,7 @@ class GoogleController extends RestfulController {
                     'id' => $userInfo->id,
                     'name' => $userInfo->name,
                     'email' => $userInfo->email,
-                    'picture' => $userInfo->picture
+                    'avatar' => $userInfo->picture
                 ]);
 
                 $userId = $this->getLastInsertedId(); // Get the new user's ID
