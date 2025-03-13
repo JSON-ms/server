@@ -55,7 +55,6 @@ class GoogleController extends RestfulController {
 
             // Redirect to a protected page or dashboard
             $decodedState = json_decode(urldecode($state), true);
-            setcookie("PHPSESSID", session_id(), time() + 3600 * 24 * 7, "/", $_ENV['INTERFACE_EDITOR_DOMAIN']);
             header('Location: ' . $_ENV['INTERFACE_EDITOR_URL'] . $decodedState['path']);
             exit;
         } else {
