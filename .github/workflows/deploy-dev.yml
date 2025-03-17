@@ -30,18 +30,18 @@ jobs:
           PUBLIC_FILE_PATH: https://json.ms/files/
           GOOGLE_OAUTH_CLIENT_ID: 637442439591-qrrpb3v9d3n5m8b8gheorfa1fbi5o6qc.apps.googleusercontent.com
           GOOGLE_OAUTH_CALLBACK_URL: https://server.json.ms/google/callback
+          JSONMS_CYPHER_KEY: ${{ secrets.JSONMS_CYPHER_KEY }}
+          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+          DATABASE_DBNAME: ${{ secrets.DATABASE_DEV_DBNAME }}
+          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
         run: |
           echo "Value of INTERFACE_EDITOR_DOMAIN is $INTERFACE_EDITOR_DOMAIN"
           echo "Value of INTERFACE_EDITOR_URL is $INTERFACE_EDITOR_URL"
           echo "Value of ACCESS_CONTROL_ALLOW_ORIGIN is $ACCESS_CONTROL_ALLOW_ORIGIN"
           echo "Value of PUBLIC_FILE_PATH is $PUBLIC_FILE_PATH"
-          echo "JSONMS_CYPHER_KEY=${{ secrets.JSONMS_CYPHER_KEY }}" >> $JSONMS_CYPHER_KEY
-          echo "DATABASE_DBNAME=${{ secrets.DATABASE_DBNAME }}" >> $DATABASE_DBNAME
-          echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> $DATABASE_HOST
-          echo "DATABASE_DBNAME=${{ secrets.DATABASE_DEV_DBNAME }}" >> $DATABASE_DBNAME
-          echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> $DATABASE_USERNAME
           echo "Value of GOOGLE_OAUTH_CLIENT_ID is $GOOGLE_OAUTH_CLIENT_ID"
-          echo "GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}" >> $GOOGLE_OAUTH_CLIENT_SECRET
           echo "Value of GOOGLE_OAUTH_CALLBACK_URL is $GOOGLE_OAUTH_CALLBACK_URL"
 
       - name: FTP Deploy
