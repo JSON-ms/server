@@ -1,4 +1,4 @@
-name: Deploy DEV to FTP
+name: Deploy DEV to host
 
 on:
   push:
@@ -45,8 +45,9 @@ jobs:
             unzip -o archive.zip -d .
             rm archive.zip
             echo "INTERFACE_EDITOR_URL=https://json.ms" > .env
+            echo "ACCESS_CONTROL_ALLOW_ORIGIN=https://json.ms" >> .env
             echo "JSONMS_CYPHER_KEY=${{ secrets.JSONMS_CYPHER_KEY }}" >> .env
-            echo "GOOGLE_OAUTH_CLIENT_ID=https://json.ms/files/" >> .env
+            echo "GOOGLE_OAUTH_CLIENT_ID=637442439591-qrrpb3v9d3n5m8b8gheorfa1fbi5o6qc.apps.googleusercontent.com" >> .env
             echo "GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}" >> .env
             echo "GOOGLE_OAUTH_CALLBACK_URL=637442439591-qrrpb3v9d3n5m8b8gheorfa1fbi5o6qc.apps.googleusercontent.com" >> .env
             echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
