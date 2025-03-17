@@ -40,15 +40,18 @@ class SessionController extends RestfulController {
         }
         else {
 
-            // Google Client Configuration
-            $client = new Google_Client();
-            $client->setClientId($_ENV['GOOGLE_OAUTH_CLIENT_ID']);
-            $client->setClientSecret($_ENV['GOOGLE_OAUTH_CLIENT_SECRET']);
-            $client->setRedirectUri($_ENV['GOOGLE_OAUTH_CALLBACK_URL']);
-            $client->addScope('email');
-            $client->addScope('profile');
-
-            $loginUrl = $client->createAuthUrl();
+            try {
+                // Google Client Configuration
+                $client = new Google_Client();
+                $client->setClientId($_ENV['GOOGLE_OAUTH_CLIENT_ID']);
+                $client->setClientSecret($_ENV['GOOGLE_OAUTH_CLIENT_SECRET']);
+                $client->setRedirectUri($_ENV['GOOGLE_OAUTH_CALLBACK_URL']);
+                $client->addScope('email');
+                $client->addScope('profile');
+                $loginUrl = $client->createAuthUrl();
+            } catch(\Exception $e) {
+                throwError(500, $e->getMessage());
+            }
 
             try {
                 $oauth2 = new Google_Service_Oauth2($client);
@@ -56,6 +59,7 @@ class SessionController extends RestfulController {
                 $loggedIn = true;
             } catch(\Exception $e) {
                 $this->responseJson([
+                    'error' => $e->getMessage(),
                     'loggedIn' => false,
                     'user' => $user,
                     'googleOAuthSignInUrl' => $loginUrl,
