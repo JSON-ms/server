@@ -25,28 +25,6 @@ jobs:
       - name: Zip the folder
         run: zip -r archive.zip . -x "./.git/*" "./.github/*"
 
-      - name: Defining environment variables
-        env:
-          INTERFACE_EDITOR_DOMAIN: json.ms
-          INTERFACE_EDITOR_URL: https://json.ms
-          ACCESS_CONTROL_ALLOW_ORIGIN: https://json.ms
-          PUBLIC_FILE_PATH: https://json.ms/files/
-          GOOGLE_OAUTH_CLIENT_ID: 637442439591-qrrpb3v9d3n5m8b8gheorfa1fbi5o6qc.apps.googleusercontent.com
-          GOOGLE_OAUTH_CALLBACK_URL: https://server.json.ms/google/callback
-          JSONMS_CYPHER_KEY: ${{ secrets.JSONMS_CYPHER_KEY }}
-          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
-          DATABASE_DBNAME: ${{ secrets.DATABASE_DEV_DBNAME }}
-          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
-        run: |
-          echo "Value of INTERFACE_EDITOR_DOMAIN is $INTERFACE_EDITOR_DOMAIN"
-          echo "Value of INTERFACE_EDITOR_URL is $INTERFACE_EDITOR_URL"
-          echo "Value of ACCESS_CONTROL_ALLOW_ORIGIN is $ACCESS_CONTROL_ALLOW_ORIGIN"
-          echo "Value of PUBLIC_FILE_PATH is $PUBLIC_FILE_PATH"
-          echo "Value of GOOGLE_OAUTH_CLIENT_ID is $GOOGLE_OAUTH_CLIENT_ID"
-          echo "Value of GOOGLE_OAUTH_CALLBACK_URL is $GOOGLE_OAUTH_CALLBACK_URL"
-
       - name: Deploy via SSH
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -65,3 +43,15 @@ jobs:
           script: |
             cd ${{ secrets.FTP_SERVER_DEV_PATH }}
             unzip -o archive.zip -d .
+            echo "INTERFACE_EDITOR_DOMAIN=dev.json.ms" > .env
+            echo "INTERFACE_EDITOR_URL=https://dev.json.ms" >> .env
+            echo "ACCESS_CONTROL_ALLOW_ORIGIN=https://dev.json.ms" >> .env
+            echo "PUBLIC_FILE_PATH=https://dev.json.ms" >> .env
+            echo "GOOGLE_OAUTH_CLIENT_ID=https://dev.json.ms/files/" >> .env
+            echo "GOOGLE_OAUTH_CALLBACK_URL=637442439591-qrrpb3v9d3n5m8b8gheorfa1fbi5o6qc.apps.googleusercontent.com" >> .env
+            echo "JSONMS_CYPHER_KEY=${{ secrets.JSONMS_CYPHER_KEY }}" >> .env
+            echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
+            echo "DATABASE_DBNAME=${{ secrets.DATABASE_DEV_DBNAME }}" >> .env
+            echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> .env
+            echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
+            echo "GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}" >> .env
