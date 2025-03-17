@@ -1,4 +1,4 @@
-name: Deploy PROD to FTP
+name: Deploy DEV to FTP
 
 on:
   push:
@@ -22,6 +22,9 @@ jobs:
       - name: Install dependencies
         run: composer install --no-dev --optimize-autoloader
 
+      - name: Zip the folder
+        run: zip -r archive.zip . -x "./.git/*" "./.github/*"
+
       - name: Defining environment variables
         env:
           INTERFACE_EDITOR_DOMAIN: json.ms
@@ -44,11 +47,21 @@ jobs:
           echo "Value of GOOGLE_OAUTH_CLIENT_ID is $GOOGLE_OAUTH_CLIENT_ID"
           echo "Value of GOOGLE_OAUTH_CALLBACK_URL is $GOOGLE_OAUTH_CALLBACK_URL"
 
-      - name: FTP Deploy
-        uses: pressidium/lftp-mirror-action@v1
+      - name: Deploy via SSH
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.FTP_SERVER }}
-          user: ${{ secrets.FTP_USERNAME }}
-          pass: ${{ secrets.FTP_PASSWORD }}
-          localDir: ./
-          remoteDir: ${{ secrets.FTP_SERVER_PROD_PATH }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          source: "archive.zip"
+          target: ${{ secrets.FTP_SERVER_PROD_PATH }}
+
+      - name: SSH into server and unzip
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          script: |
+            cd ${{ secrets.FTP_SERVER_PROD_PATH }}
+            unzip -o archive.zip -d .
