@@ -1,0 +1,54 @@
+name: Deploy DEV to FTP
+
+on:
+  push:
+    branches:
+      - dev  # Change this to your default branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer
+
+      - name: Install dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Defining environment variables
+        env:
+          INTERFACE_EDITOR_DOMAIN: json.ms
+          INTERFACE_EDITOR_URL: https://json.ms
+          ACCESS_CONTROL_ALLOW_ORIGIN: https://json.ms
+          PUBLIC_FILE_PATH: https://json.ms/files/
+          GOOGLE_OAUTH_CLIENT_ID: 637442439591-qrrpb3v9d3n5m8b8gheorfa1fbi5o6qc.apps.googleusercontent.com
+          GOOGLE_OAUTH_CALLBACK_URL: https://server.json.ms/google/callback
+        run: |
+          echo "Value of INTERFACE_EDITOR_DOMAIN is $INTERFACE_EDITOR_DOMAIN"
+          echo "Value of INTERFACE_EDITOR_URL is $INTERFACE_EDITOR_URL"
+          echo "Value of ACCESS_CONTROL_ALLOW_ORIGIN is $ACCESS_CONTROL_ALLOW_ORIGIN"
+          echo "Value of PUBLIC_FILE_PATH is $PUBLIC_FILE_PATH"
+          echo "JSONMS_CYPHER_KEY=${{ secrets.JSONMS_CYPHER_KEY }}" >> $JSONMS_CYPHER_KEY
+          echo "DATABASE_DBNAME=${{ secrets.DATABASE_DBNAME }}" >> $DATABASE_DBNAME
+          echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> $DATABASE_HOST
+          echo "DATABASE_DBNAME=${{ secrets.DATABASE_DEV_DBNAME }}" >> $DATABASE_DBNAME
+          echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> $DATABASE_USERNAME
+          echo "Value of GOOGLE_OAUTH_CLIENT_ID is $GOOGLE_OAUTH_CLIENT_ID"
+          echo "GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}" >> $GOOGLE_OAUTH_CLIENT_SECRET
+          echo "Value of GOOGLE_OAUTH_CALLBACK_URL is $GOOGLE_OAUTH_CALLBACK_URL"
+
+      - name: FTP Deploy
+        uses: pressidium/lftp-mirror-action@v1
+        with:
+          host: ${{ secrets.FTP_SERVER }}  # Your FTP server
+          user: ${{ secrets.FTP_USERNAME }}  # Store your FTP username in GitHub Secrets
+          pass: ${{ secrets.FTP_PASSWORD }}  # Store your FTP password in GitHub Secrets
+          localDir: ./dist/  # Adjust this to your build output directory
+          remoteDir: ${{ secrets.FTP_SERVER_DEV_PATH }}  # Adjust this to your desired server directory
