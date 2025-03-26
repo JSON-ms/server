@@ -30,6 +30,7 @@ class GoogleController extends RestfulController {
             if ($stmt->rowCount() > 0) {
                 // User exists, fetch data
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                $userId = $user['id'];
             } else {
                 // User does not exist, insert new user
                 $this->query('insert-user', [
@@ -40,17 +41,10 @@ class GoogleController extends RestfulController {
                 ]);
 
                 $userId = $this->getLastInsertedId(); // Get the new user's ID
-                $user = [
-                    'id' => $userId,
-                    'googleId' => $userInfo->id,
-                    'name' => $userInfo->name,
-                    'email' => $userInfo->email,
-                    'avatar' => $userInfo->picture,
-                ];
             }
 
             // Store user information in the session
-            $_SESSION['user'] = $user;
+            $_SESSION['user_id'] = $userId;
             $_SESSION['access_token'] = $token['access_token'];
 
             // Redirect to a protected page or dashboard

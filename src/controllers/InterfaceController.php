@@ -6,7 +6,7 @@ class InterfaceController extends RestfulController {
 
     public function indexAction() {
         $stmt = $this->query('get-all-interfaces', [
-            'userId' => $this->getCurrentUser()->id,
+            'userId' => $this->getCurrentUserId(),
         ]);
         $users = $stmt->fetchAll();
         $this->responseJson($users);
@@ -30,7 +30,7 @@ class InterfaceController extends RestfulController {
             'server_url' => $data->server_url,
             'server_secret' => $serverSecret,
             'cypher_key' => $encryptedCypherKey,
-            'created_by' => $this->getCurrentUser()->id,
+            'created_by' => $this->getCurrentUserId(),
         ]);
 
         // Get inserted interface
@@ -56,11 +56,11 @@ class InterfaceController extends RestfulController {
                 'logo' => $data->logo,
                 'content' => $data->content,
                 'server_url' => $data->server_url,
-                'userId' => $this->getCurrentUser()->id,
+                'userId' => $this->getCurrentUserId(),
             ]);
 
             // Clear all existing permissions (will be added later on)
-            if ($data->created_by === $this->getCurrentUser()->id) {
+            if ($data->created_by === $this->getCurrentUserId()) {
                 $this->updatePermissions($data);
             }
 
@@ -72,7 +72,7 @@ class InterfaceController extends RestfulController {
         if ($this->hasAccess($id)) {
             $stmt = $this->query('delete-interface', [
                 'uuid' => $id,
-                'userId' => $this->getCurrentUser()->id,
+                'userId' => $this->getCurrentUserId(),
             ]);
             if ($stmt->rowCount() > 0) {
                 $this->responseJson(true);
@@ -106,7 +106,7 @@ class InterfaceController extends RestfulController {
     private function getAccessibleInterface($uuid, $showError = true): false | stdClass {
         $stmt = $this->query('get-accessible-interface-by-uuid', [
             'uuid' => $uuid,
-            'userId' => $this->getCurrentUser()->id,
+            'userId' => $this->getCurrentUserId(),
         ]);
         if ($stmt->rowCount() > 0) {
             $interface = $stmt->fetch(PDO::FETCH_OBJ);
@@ -129,7 +129,7 @@ class InterfaceController extends RestfulController {
         $this->query('insert-history', [
             'uuid' => $interface->uuid,
             'content' => $interface->content,
-            'userId' => $this->getCurrentUser()->id,
+            'userId' => $this->getCurrentUserId(),
         ]);
     }
 

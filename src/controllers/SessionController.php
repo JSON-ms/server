@@ -15,7 +15,7 @@ class SessionController extends RestfulController {
 
             // Check if user already exists
             $stmt = $this->query('get-user-by-id', [
-                'id' => $this->getCurrentUser()->id,
+                'id' => $this->getCurrentUserId(),
             ]);
 
             if ($stmt->rowCount() > 0) {
@@ -25,9 +25,8 @@ class SessionController extends RestfulController {
 
                 // Fetch all interfaces
                 $stmt = $this->query('get-all-interfaces', [
-                    'userId' => $this->getCurrentUser()->id,
+                    'userId' => $this->getCurrentUserId(),
                 ]);
-
                 if ($stmt->rowCount() > 0) {
                     $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
                     foreach ($rows as $row) {
@@ -36,10 +35,18 @@ class SessionController extends RestfulController {
                         $interfaces[] = $row;
                     }
                 }
+            } else {
+                // Google Client Configuration
+                $client = new Google_Client();
+                $client->setClientId($_ENV['GOOGLE_OAUTH_CLIENT_ID']);
+                $client->setClientSecret($_ENV['GOOGLE_OAUTH_CLIENT_SECRET']);
+                $client->setRedirectUri($_ENV['GOOGLE_OAUTH_CALLBACK_URL']);
+                $client->addScope('email');
+                $client->addScope('profile');
+                $loginUrl = $client->createAuthUrl();
             }
         }
         else {
-
             try {
                 // Google Client Configuration
                 $client = new Google_Client();
@@ -69,7 +76,7 @@ class SessionController extends RestfulController {
 
             // Check if user already exists
             $stmt = $this->query('get-user-by-google-id', [
-                'id' => $this->getCurrentUser()->id,
+                'id' => $this->getCurrentUserId(),
             ]);
 
             if ($stmt->rowCount() > 0) {
