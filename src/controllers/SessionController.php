@@ -8,8 +8,19 @@ class SessionController extends RestfulController {
 
         $loggedIn = isset($_SESSION['access_token']) && $_SESSION['access_token'];
         $user = null;
-        $interfaces = [];
         $loginUrl = null;
+        $interfaces = [];
+
+        // Fetch demo interface
+        $stmt = $this->query('get-demo-interface');
+        if ($stmt->rowCount() > 0) {
+            $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+            foreach ($rows as $row) {
+                $row->permission_admin = [];
+                $row->permission_interface = [];
+                $interfaces[] = $row;
+            }
+        }
 
         if ($loggedIn) {
 
@@ -22,19 +33,6 @@ class SessionController extends RestfulController {
 
                 // User exists, fetch data
                 $user = $stmt->fetch(PDO::FETCH_OBJ);
-
-                // Fetch all interfaces
-                $stmt = $this->query('get-all-interfaces', [
-                    'userId' => $this->getCurrentUserId(),
-                ]);
-                if ($stmt->rowCount() > 0) {
-                    $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
-                    foreach ($rows as $row) {
-                        $row->permission_admin = array_filter(explode(',', $row->permission_admin ?? ''));
-                        $row->permission_interface = array_filter(explode(',', $row->permission_interface ?? ''));
-                        $interfaces[] = $row;
-                    }
-                }
             } else {
                 // Google Client Configuration
                 $client = new Google_Client();
@@ -84,6 +82,23 @@ class SessionController extends RestfulController {
             }
         }
 
+        if ($loggedIn && isset($user)) {
+
+            // Fetch all interfaces
+            $stmt = $this->query('get-all-interfaces', [
+                'userId' => $this->getCurrentUserId(),
+            ]);
+            $interfaces = [];
+            if ($stmt->rowCount() > 0) {
+                $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+                foreach ($rows as $row) {
+                    $row->permission_admin = array_filter(explode(',', $row->permission_admin ?? ''));
+                    $row->permission_interface = array_filter(explode(',', $row->permission_interface ?? ''));
+                    $interfaces[] = $row;
+                }
+            }
+        }
+
         $this->responseJson([
             'loggedIn' => $loggedIn && isset($user),
             'user' => $user,
@@ -107,11 +122,24 @@ class SessionController extends RestfulController {
         // Generate the login URL
         $loginUrl = $client->createAuthUrl();
 
+        // Fetch demo interface
+        $interfaces = [];
+        $stmt = $this->query('get-demo-interface');
+        if ($stmt->rowCount() > 0) {
+            $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+            foreach ($rows as $row) {
+                $row->permission_admin = [];
+                $row->permission_interface = [];
+                $interfaces[] = $row;
+            }
+        }
+
         // Return the JSON response
         $this->responseJson([
             'loggedIn' => false,
             'user' => null,
-            'googleOAuthSignInUrl' => $loginUrl
+            'googleOAuthSignInUrl' => $loginUrl,
+            'interfaces' => $interfaces,
         ]);
     }
 }
