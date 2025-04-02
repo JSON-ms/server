@@ -6,6 +6,7 @@
     "ext-openssl": "*",
     "monolog/monolog": "^2.5",
     "psr/log": "^2.0",
-    "ext-pdo": "*"
+    "ext-pdo": "*",
+    "ext-fileinfo": "*"
   }
 }
