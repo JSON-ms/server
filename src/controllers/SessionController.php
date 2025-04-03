@@ -18,6 +18,7 @@ class SessionController extends RestfulController {
             foreach ($rows as $row) {
                 $row->permission_admin = [];
                 $row->permission_interface = [];
+                $row->type = 'interface,admin';
                 $interfaces[] = $row;
             }
         }
@@ -130,6 +131,7 @@ class SessionController extends RestfulController {
             foreach ($rows as $row) {
                 $row->permission_admin = [];
                 $row->permission_interface = [];
+                $row->type = 'interface,admin';
                 $interfaces[] = $row;
             }
         }
