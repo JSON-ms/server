@@ -1,4 +1,8 @@
 {
+  "version": "1.0.0",
+  "name": "jsonms/server",
+  "description": "The JSON.ms Request Handler Server is a robust backend solution designed to manage and process all incoming requests from the main JSON.ms website.",
+  "license": "BSD-3-Clause",
   "require": {
     "google/apiclient": "^2.18",
     "vlucas/phpdotenv": "^5.6",
