@@ -4,14 +4,7 @@ use JSONms\Controllers\RestfulController;
 
 class SessionController extends RestfulController {
 
-    public function indexAction() {
-
-        $loggedIn = isset($_SESSION['access_token']) && $_SESSION['access_token'];
-        $user = null;
-        $loginUrl = null;
-        $interfaces = [];
-
-        // Fetch demo interface
+    private function getDemoInterface() {
         $stmt = $this->query('get-demo-interface');
         if ($stmt->rowCount() > 0) {
             $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -19,8 +12,34 @@ class SessionController extends RestfulController {
                 $row->permission_admin = [];
                 $row->permission_interface = [];
                 $row->type = 'interface,admin';
-                $interfaces[] = $row;
+                return $row;
             }
+        }
+        return null;
+    }
+
+    private function getWebhooks($userId) {
+        $stmt = $this->query('get-all-webhooks', [
+            'userId' => $userId,
+        ]);
+        if ($stmt->rowCount() > 0) {
+            return $stmt->fetchAll(PDO::FETCH_OBJ);
+        }
+        return [];
+    }
+
+    public function indexAction() {
+
+        $loggedIn = isset($_SESSION['access_token']) && $_SESSION['access_token'];
+        $user = null;
+        $loginUrl = null;
+        $interfaces = [];
+        $webhooks = [];
+
+        // Fetch demo interface
+        $demo = $this->getDemoInterface();
+        if ($demo) {
+            $interfaces[] = $demo;
         }
 
         if ($loggedIn) {
@@ -70,6 +89,7 @@ class SessionController extends RestfulController {
                     'user' => $user,
                     'googleOAuthSignInUrl' => $loginUrl,
                     'interfaces' => $interfaces,
+                    'webhooks' => $webhooks,
                 ]);
             }
 
@@ -100,11 +120,18 @@ class SessionController extends RestfulController {
             }
         }
 
+        // Fetch demo interface
+        $loggedIn = $loggedIn && isset($user);
+        if ($loggedIn) {
+            $webhooks = $this->getWebhooks($user->id);
+        }
+
         $this->responseJson([
-            'loggedIn' => $loggedIn && isset($user),
+            'loggedIn' => $loggedIn,
             'user' => $user,
             'googleOAuthSignInUrl' => $loginUrl,
             'interfaces' => $interfaces,
+            'webhooks' => $webhooks,
         ]);
     }
 
@@ -125,15 +152,9 @@ class SessionController extends RestfulController {
 
         // Fetch demo interface
         $interfaces = [];
-        $stmt = $this->query('get-demo-interface');
-        if ($stmt->rowCount() > 0) {
-            $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
-            foreach ($rows as $row) {
-                $row->permission_admin = [];
-                $row->permission_interface = [];
-                $row->type = 'interface,admin';
-                $interfaces[] = $row;
-            }
+        $demo = $this->getDemoInterface();
+        if ($demo) {
+            $interfaces[] = $demo;
         }
 
         // Return the JSON response

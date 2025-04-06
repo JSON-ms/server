@@ -93,6 +93,12 @@ abstract class BaseController {
         return $this->user->id;
     }
 
+    protected function getHash($length = 10): string {
+        $bytes = random_bytes($length);
+        $result = bin2hex($bytes);
+        return substr($result, 0, $length);
+    }
+
     public function encrypt($data, $encryptionKey) {
         $ivLength = openssl_cipher_iv_length('AES-256-CBC');
         $iv = openssl_random_pseudo_bytes($ivLength);

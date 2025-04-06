@@ -19,17 +19,13 @@ class InterfaceController extends RestfulController {
 
     public function createAction($data) {
         $hash = $this->getHash();
-        $cypherKey = $this->getHash(24);
-        $serverSecret = $this->encrypt($this->getHash(24), $cypherKey);
-        $encryptedCypherKey = $this->encrypt($cypherKey, $_ENV['JSONMS_CYPHER_KEY']);
+
         $this->query('insert-interface', [
             'hash' => $hash,
             'label' => $data->label,
             'logo' => $data->logo,
             'content' => $data->content,
-            'server_url' => $data->server_url,
-            'server_secret' => $serverSecret,
-            'cypher_key' => $encryptedCypherKey,
+            'webhook' => $data->webhook,
             'created_by' => $this->getCurrentUserId(),
         ]);
 
@@ -55,7 +51,7 @@ class InterfaceController extends RestfulController {
                 'label' => $data->label,
                 'logo' => $data->logo,
                 'content' => $data->content,
-                'server_url' => $data->server_url,
+                'webhook' => $data->webhook,
                 'userId' => $this->getCurrentUserId(),
             ]);
 
@@ -78,25 +74,6 @@ class InterfaceController extends RestfulController {
                 $this->responseJson(true);
             }
         }
-    }
-
-    public function secretKeyAction($uuid) {
-        $interface = $this->getAccessibleInterface($uuid);
-        $decryptedCypherKey = $this->decrypt($interface->cypher_key, $_ENV['JSONMS_CYPHER_KEY']);
-        $decryptedServerKey = $this->decrypt($interface->server_secret, $decryptedCypherKey);
-        $this->responseJson($decryptedServerKey);
-    }
-
-    public function cypherKeyAction($uuid) {
-        $interface = $this->getAccessibleInterface($uuid);
-        $decryptedCypherKey = $this->decrypt($interface->cypher_key, $_ENV['JSONMS_CYPHER_KEY']);
-        $this->responseJson($decryptedCypherKey);
-    }
-
-    private function getHash($length = 10): string {
-        $bytes = random_bytes($length);
-        $result = bin2hex($bytes);
-        return substr($result, 0, $length);
     }
 
     private function hasAccess($uuid, $showError = true): bool {
