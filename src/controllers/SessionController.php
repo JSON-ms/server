@@ -163,6 +163,7 @@ class SessionController extends RestfulController {
             'user' => null,
             'googleOAuthSignInUrl' => $loginUrl,
             'interfaces' => $interfaces,
+            'webhooks' => [],
         ]);
     }
 }
