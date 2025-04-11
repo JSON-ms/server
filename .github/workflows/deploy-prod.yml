@@ -1,0 +1,56 @@
+name: Deploy DEV to host
+
+on:
+  push:
+    branches:
+      - master  # Change this to your default branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer
+
+      - name: Install dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Zip the folder
+        run: zip -r archive.zip . -x "./.git/*" "./.github/*"
+
+      - name: Deploy via SSH
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          source: "archive.zip"
+          target: ${{ secrets.FTP_SERVER_PROD_PATH }}
+
+      - name: SSH into server and unzip
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          script: |
+            cd ${{ secrets.FTP_SERVER_PROD_PATH }}
+            unzip -o archive.zip -d .
+            rm archive.zip
+            echo "INTERFACE_EDITOR_URL=https://json.ms" > .env
+            echo "ACCESS_CONTROL_ALLOW_ORIGIN=https://json.ms" >> .env
+            echo "JSONMS_CYPHER_KEY=${{ secrets.JSONMS_CYPHER_KEY }}" >> .env
+            echo "GOOGLE_OAUTH_CLIENT_ID=637442439591-qrrpb3v9d3n5m8b8gheorfa1fbi5o6qc.apps.googleusercontent.com" >> .env
+            echo "GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}" >> .env
+            echo "GOOGLE_OAUTH_CALLBACK_URL=https://server.json.ms/google/callback" >> .env
+            echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
+            echo "DATABASE_DBNAME=${{ secrets.DATABASE_PROD_DBNAME }}" >> .env
+            echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> .env
+            echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env

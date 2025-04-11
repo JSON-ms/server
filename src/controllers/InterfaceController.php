@@ -6,7 +6,7 @@ class InterfaceController extends RestfulController {
 
     public function indexAction() {
         $stmt = $this->query('get-all-interfaces', [
-            'userId' => $this->getCurrentUser()->id,
+            'userId' => $this->getCurrentUserId(),
         ]);
         $users = $stmt->fetchAll();
         $this->responseJson($users);
@@ -19,18 +19,14 @@ class InterfaceController extends RestfulController {
 
     public function createAction($data) {
         $hash = $this->getHash();
-        $cypherKey = $this->getHash(24);
-        $serverSecret = $this->encrypt($this->getHash(24), $cypherKey);
-        $encryptedCypherKey = $this->encrypt($cypherKey, $_ENV['JSONMS_CYPHER_KEY']);
+
         $this->query('insert-interface', [
             'hash' => $hash,
             'label' => $data->label,
             'logo' => $data->logo,
             'content' => $data->content,
-            'server_url' => $data->server_url,
-            'server_secret' => $serverSecret,
-            'cypher_key' => $encryptedCypherKey,
-            'created_by' => $this->getCurrentUser()->id,
+            'webhook' => $data->webhook,
+            'created_by' => $this->getCurrentUserId(),
         ]);
 
         // Get inserted interface
@@ -55,12 +51,12 @@ class InterfaceController extends RestfulController {
                 'label' => $data->label,
                 'logo' => $data->logo,
                 'content' => $data->content,
-                'server_url' => $data->server_url,
-                'userId' => $this->getCurrentUser()->id,
+                'webhook' => $data->webhook,
+                'userId' => $this->getCurrentUserId(),
             ]);
 
             // Clear all existing permissions (will be added later on)
-            if ($data->created_by === $this->getCurrentUser()->id) {
+            if ($data->created_by === $this->getCurrentUserId()) {
                 $this->updatePermissions($data);
             }
 
@@ -72,31 +68,12 @@ class InterfaceController extends RestfulController {
         if ($this->hasAccess($id)) {
             $stmt = $this->query('delete-interface', [
                 'uuid' => $id,
-                'userId' => $this->getCurrentUser()->id,
+                'userId' => $this->getCurrentUserId(),
             ]);
             if ($stmt->rowCount() > 0) {
                 $this->responseJson(true);
             }
         }
-    }
-
-    public function secretKeyAction($uuid) {
-        $interface = $this->getAccessibleInterface($uuid);
-        $decryptedCypherKey = $this->decrypt($interface->cypher_key, $_ENV['JSONMS_CYPHER_KEY']);
-        $decryptedServerKey = $this->decrypt($interface->server_secret, $decryptedCypherKey);
-        $this->responseJson($decryptedServerKey);
-    }
-
-    public function cypherKeyAction($uuid) {
-        $interface = $this->getAccessibleInterface($uuid);
-        $decryptedCypherKey = $this->decrypt($interface->cypher_key, $_ENV['JSONMS_CYPHER_KEY']);
-        $this->responseJson($decryptedCypherKey);
-    }
-
-    private function getHash($length = 10): string {
-        $bytes = random_bytes($length);
-        $result = bin2hex($bytes);
-        return substr($result, 0, $length);
     }
 
     private function hasAccess($uuid, $showError = true): bool {
@@ -106,7 +83,7 @@ class InterfaceController extends RestfulController {
     private function getAccessibleInterface($uuid, $showError = true): false | stdClass {
         $stmt = $this->query('get-accessible-interface-by-uuid', [
             'uuid' => $uuid,
-            'userId' => $this->getCurrentUser()->id,
+            'userId' => $this->getCurrentUserId(),
         ]);
         if ($stmt->rowCount() > 0) {
             $interface = $stmt->fetch(PDO::FETCH_OBJ);
@@ -129,7 +106,7 @@ class InterfaceController extends RestfulController {
         $this->query('insert-history', [
             'uuid' => $interface->uuid,
             'content' => $interface->content,
-            'userId' => $this->getCurrentUser()->id,
+            'userId' => $this->getCurrentUserId(),
         ]);
     }
 

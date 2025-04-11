@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Path to composer.json
+COMPOSER_FILE="composer.json"
+
+# Check if composer.json exists
+if [ ! -f "$COMPOSER_FILE" ]; then
+    echo "$COMPOSER_FILE not found!"
+    exit 1
+fi
+
+# Use jq to bump the patch version
+if command -v jq &> /dev/null; then
+    # Read the current version
+    CURRENT_VERSION=$(jq -r '.version' "$COMPOSER_FILE")
+
+    # Split the version into an array
+    IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+
+    # Increment the patch version
+    NEW_PATCH=$((PATCH + 1))
+
+    # Create the new version string
+    NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+
+    # Update the composer.json file
+    jq --arg new_version "$NEW_VERSION" '.version = $new_version' "$COMPOSER_FILE" > tmp.$.json && mv tmp.$.json "$COMPOSER_FILE"
+
+    echo "Bumped version from $CURRENT_VERSION to $NEW_VERSION"
+
+    # Stage the changes to package.json
+    git add composer.json
+else
+    echo "jq is not installed. Please install jq to use this hook."
+    exit 1
+fi

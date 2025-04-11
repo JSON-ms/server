@@ -1,7 +1,7 @@
 <?php
 
 function dd(...$values) {
-    die(var_dump(...$values));
+    throwError(400, $values);
 }
 
 function throwError($code, $body) {

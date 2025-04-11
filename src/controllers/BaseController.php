@@ -79,14 +79,24 @@ abstract class BaseController {
         return $this->queryRaw($sql, $params);
     }
 
-    public function getCurrentUser() {
-        if ($this->user == null) {
+    public function getCurrentUserId() {
+        if ($this->user == null && isset($_SESSION['user_id'])) {
             $stmt = $this->query('get-user-by-id', [
-                'id' => $_SESSION['user']['id']
+                'id' => $_SESSION['user_id']
             ]);
             $this->user = $stmt->fetch(PDO::FETCH_OBJ);
+            if ($this->user) {
+                return $this->user->id;
+            }
+            return null;
         }
-        return $this->user;
+        return $this->user->id;
+    }
+
+    protected function getHash($length = 10): string {
+        $bytes = random_bytes($length);
+        $result = bin2hex($bytes);
+        return substr($result, 0, $length);
     }
 
     public function encrypt($data, $encryptionKey) {
