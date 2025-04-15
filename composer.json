@@ -1,5 +1,5 @@
 {
-  "version": "1.0.8",
+  "version": "1.0.9",
   "name": "jsonms/server",
   "description": "The JSON.ms Request Handler Server is a robust backend solution designed to manage and process all incoming requests from the main JSON.ms website.",
   "license": "BSD-3-Clause",
