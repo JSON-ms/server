@@ -49,7 +49,7 @@ class GoogleController extends RestfulController {
 
             // Redirect to a protected page or dashboard
             $decodedState = json_decode(urldecode($state), true);
-            header('Location: ' . $_ENV['INTERFACE_EDITOR_URL'] . $decodedState['path']);
+            header('Location: ' . $_ENV['STRUCTURE_EDITOR_URL'] . $decodedState['path']);
             exit;
         } else {
             throwError(400, "Error during authentication.");

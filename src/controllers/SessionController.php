@@ -4,14 +4,14 @@ use JSONms\Controllers\RestfulController;
 
 class SessionController extends RestfulController {
 
-    private function getDemoInterface() {
-        $stmt = $this->query('get-demo-interface');
+    private function getDemoStructure() {
+        $stmt = $this->query('get-demo-structure');
         if ($stmt->rowCount() > 0) {
             $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
             foreach ($rows as $row) {
                 $row->permission_admin = [];
-                $row->permission_interface = [];
-                $row->type = 'interface,admin';
+                $row->permission_structure = [];
+                $row->type = 'structure,admin';
                 return $row;
             }
         }
@@ -33,13 +33,13 @@ class SessionController extends RestfulController {
         $loggedIn = isset($_SESSION['access_token']) && $_SESSION['access_token'];
         $user = null;
         $loginUrl = null;
-        $interfaces = [];
+        $structures = [];
         $webhooks = [];
 
-        // Fetch demo interface
-        $demo = $this->getDemoInterface();
+        // Fetch demo structure
+        $demo = $this->getDemoStructure();
         if ($demo) {
-            $interfaces[] = $demo;
+            $structures[] = $demo;
         }
 
         if ($loggedIn) {
@@ -88,7 +88,7 @@ class SessionController extends RestfulController {
                     'loggedIn' => false,
                     'user' => $user,
                     'googleOAuthSignInUrl' => $loginUrl,
-                    'interfaces' => $interfaces,
+                    'structures' => $structures,
                     'webhooks' => $webhooks,
                 ]);
             }
@@ -105,22 +105,22 @@ class SessionController extends RestfulController {
 
         if ($loggedIn && isset($user)) {
 
-            // Fetch all interfaces
-            $stmt = $this->query('get-all-interfaces', [
+            // Fetch all structures
+            $stmt = $this->query('get-all-structures', [
                 'userId' => $this->getCurrentUserId(),
             ]);
-            $interfaces = [];
+            $structures = [];
             if ($stmt->rowCount() > 0) {
                 $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
                 foreach ($rows as $row) {
                     $row->permission_admin = array_filter(explode(',', $row->permission_admin ?? ''));
-                    $row->permission_interface = array_filter(explode(',', $row->permission_interface ?? ''));
-                    $interfaces[] = $row;
+                    $row->permission_structure = array_filter(explode(',', $row->permission_structure ?? ''));
+                    $structures[] = $row;
                 }
             }
         }
 
-        // Fetch demo interface
+        // Fetch demo structure
         $loggedIn = $loggedIn && isset($user);
         if ($loggedIn) {
             $webhooks = $this->getWebhooks($user->id);
@@ -130,7 +130,7 @@ class SessionController extends RestfulController {
             'loggedIn' => $loggedIn,
             'user' => $user,
             'googleOAuthSignInUrl' => $loginUrl,
-            'interfaces' => $interfaces,
+            'structures' => $structures,
             'webhooks' => $webhooks,
         ]);
     }
@@ -150,11 +150,11 @@ class SessionController extends RestfulController {
         // Generate the login URL
         $loginUrl = $client->createAuthUrl();
 
-        // Fetch demo interface
-        $interfaces = [];
-        $demo = $this->getDemoInterface();
+        // Fetch demo structure
+        $structures = [];
+        $demo = $this->getDemoStructure();
         if ($demo) {
-            $interfaces[] = $demo;
+            $structures[] = $demo;
         }
 
         // Return the JSON response
@@ -162,7 +162,7 @@ class SessionController extends RestfulController {
             'loggedIn' => false,
             'user' => null,
             'googleOAuthSignInUrl' => $loginUrl,
-            'interfaces' => $interfaces,
+            'structures' => $structures,
             'webhooks' => [],
         ]);
     }
