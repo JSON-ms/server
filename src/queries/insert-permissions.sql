@@ -1,2 +1,2 @@
-INSERT INTO permissions (interface_uuid, type, email)
+INSERT INTO permissions (structure_uuid, type, email)
 VALUES (:uuid, :type, :email)

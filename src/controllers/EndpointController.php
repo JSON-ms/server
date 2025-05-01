@@ -2,29 +2,29 @@
 
 use JSONms\Controllers\RestfulController;
 
-class WebhookController extends RestfulController {
+class EndpointController extends RestfulController {
 
-    public function saveAction($webhooks) {
-        foreach($webhooks as $webhook) {
-            if (isset($webhook->uuid)) {
-                $this->query('update-webhook-by-uuid', [
-                    'uuid' => $webhook->uuid,
-                    'url' => $webhook->url,
+    public function saveAction($endpoints) {
+        foreach($endpoints as $endpoint) {
+            if (isset($endpoint->uuid)) {
+                $this->query('update-endpoint-by-uuid', [
+                    'uuid' => $endpoint->uuid,
+                    'url' => $endpoint->url,
                     'userId' => $this->getCurrentUserId(),
                 ]);
             } else {
                 $cypherKey = $this->getHash(24);
                 $serverSecret = $this->encrypt($this->getHash(24), $cypherKey);
                 $encryptedCypherKey = $this->encrypt($cypherKey, $_ENV['JSONMS_CYPHER_KEY']);
-                $this->query('insert-webhook', [
-                    'url' => $webhook->url,
+                $this->query('insert-endpoint', [
+                    'url' => $endpoint->url,
                     'secret' => $serverSecret,
                     'cypher' => $encryptedCypherKey,
                     'created_by' => $this->getCurrentUserId(),
                 ]);
             }
         }
-        $stmt = $this->query('get-all-webhooks', [
+        $stmt = $this->query('get-all-endpoints', [
             'userId' => $this->getCurrentUserId(),
         ]);
 
@@ -34,7 +34,7 @@ class WebhookController extends RestfulController {
     }
 
     public function deleteAction($id) {
-        $stmt = $this->query('delete-webhook-by-uuid', [
+        $stmt = $this->query('delete-endpoint-by-uuid', [
             'uuid' => $id,
             'userId' => $this->getCurrentUserId(),
         ]);
@@ -44,20 +44,20 @@ class WebhookController extends RestfulController {
     }
 
     public function secretKeyAction($uuid) {
-        $webhook = $this->getWebhook($uuid);
-        $decryptedCypherKey = $this->decrypt($webhook->cypher, $_ENV['JSONMS_CYPHER_KEY']);
-        $decryptedServerKey = $this->decrypt($webhook->secret, $decryptedCypherKey);
+        $endpoint = $this->getEndpoint($uuid);
+        $decryptedCypherKey = $this->decrypt($endpoint->cypher, $_ENV['JSONMS_CYPHER_KEY']);
+        $decryptedServerKey = $this->decrypt($endpoint->secret, $decryptedCypherKey);
         $this->responseJson($decryptedServerKey);
     }
 
     public function cypherKeyAction($uuid) {
-        $webhook = $this->getWebhook($uuid);
-        $decryptedCypherKey = $this->decrypt($webhook->cypher, $_ENV['JSONMS_CYPHER_KEY']);
+        $endpoint = $this->getEndpoint($uuid);
+        $decryptedCypherKey = $this->decrypt($endpoint->cypher, $_ENV['JSONMS_CYPHER_KEY']);
         $this->responseJson($decryptedCypherKey);
     }
 
-    private function getWebhook($uuid, $showError = true): false | stdClass {
-        $stmt = $this->query('get-webhook-by-uuid', [
+    private function getEndpoint($uuid, $showError = true): false | stdClass {
+        $stmt = $this->query('get-endpoint-by-uuid', [
             'uuid' => $uuid,
             'userId' => $this->getCurrentUserId(),
         ]);
@@ -65,7 +65,7 @@ class WebhookController extends RestfulController {
             return $stmt->fetch(PDO::FETCH_OBJ);
         }
         if ($showError) {
-            throwError(403, 'You don\'t have permission to access this webhook');
+            throwError(403, 'You don\'t have permission to access this endpoint');
         }
         return false;
     }
