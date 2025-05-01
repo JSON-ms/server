@@ -18,8 +18,8 @@ class SessionController extends RestfulController {
         return null;
     }
 
-    private function getWebhooks($userId) {
-        $stmt = $this->query('get-all-webhooks', [
+    private function getEndpoints($userId) {
+        $stmt = $this->query('get-all-endpoints', [
             'userId' => $userId,
         ]);
         if ($stmt->rowCount() > 0) {
@@ -34,7 +34,7 @@ class SessionController extends RestfulController {
         $user = null;
         $loginUrl = null;
         $structures = [];
-        $webhooks = [];
+        $endpoints = [];
 
         // Fetch demo structure
         $demo = $this->getDemoStructure();
@@ -89,7 +89,7 @@ class SessionController extends RestfulController {
                     'user' => $user,
                     'googleOAuthSignInUrl' => $loginUrl,
                     'structures' => $structures,
-                    'webhooks' => $webhooks,
+                    'endpoints' => $endpoints,
                 ]);
             }
 
@@ -123,7 +123,7 @@ class SessionController extends RestfulController {
         // Fetch demo structure
         $loggedIn = $loggedIn && isset($user);
         if ($loggedIn) {
-            $webhooks = $this->getWebhooks($user->id);
+            $endpoints = $this->getEndpoints($user->id);
         }
 
         $this->responseJson([
@@ -131,7 +131,7 @@ class SessionController extends RestfulController {
             'user' => $user,
             'googleOAuthSignInUrl' => $loginUrl,
             'structures' => $structures,
-            'webhooks' => $webhooks,
+            'endpoints' => $endpoints,
         ]);
     }
 
@@ -163,7 +163,7 @@ class SessionController extends RestfulController {
             'user' => null,
             'googleOAuthSignInUrl' => $loginUrl,
             'structures' => $structures,
-            'webhooks' => [],
+            'endpoints' => [],
         ]);
     }
 }

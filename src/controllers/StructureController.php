@@ -22,10 +22,10 @@ class StructureController extends RestfulController {
 
         $this->query('insert-structure', [
             'hash' => $hash,
-            'label' => $data->label,
-            'logo' => $data->logo,
-            'content' => $data->content,
-            'webhook' => $data->webhook,
+            'label' => $data->content->label,
+            'logo' => $data->content->logo,
+            'content' => $data->content->content,
+            'endpoint' => $data->content->endpoint,
             'created_by' => $this->getCurrentUserId(),
         ]);
 
@@ -34,9 +34,6 @@ class StructureController extends RestfulController {
             'hash' => $hash,
         ])->fetch(PDO::FETCH_OBJ);
         $this->preparePermissions($structure);
-
-        // Update structure
-//        $this->updateStructure($hash, $structure);
 
         $this->responseJson($structure);
     }
@@ -50,23 +47,20 @@ class StructureController extends RestfulController {
 
             // Update structure
             $this->query('update-structure-by-uuid', [
-                'uuid' => $data->uuid,
-                'label' => $data->label,
-                'logo' => $data->logo,
-                'content' => $data->content,
-                'webhook' => $data->webhook,
+                'uuid' => $data->content->uuid,
+                'label' => $data->content->label,
+                'logo' => $data->content->logo,
+                'content' => $data->content->content,
+                'endpoint' => $data->content->endpoint,
                 'userId' => $this->getCurrentUserId(),
             ]);
 
             // Clear all existing permissions (will be added later on)
-            if ($data->created_by === $this->getCurrentUserId()) {
-                $this->updatePermissions($data);
+            if ($data->content->created_by === $this->getCurrentUserId()) {
+                $this->updatePermissions($data->content);
             }
 
-            // Update structure
-//            $this->updateStructure($data->hash, $structure);
-
-            $this->responseJson($data);
+            $this->responseJson($data->content);
         }
     }
 
