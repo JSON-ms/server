@@ -30,7 +30,7 @@ jobs:
           mkdir .compress
           mv archive.zip .compress/.
           cd .compress
-          echo "<?php ($z=new ZipArchive)->open('archive.zip')===TRUE && $z->extractTo('.') && $z->close(); unlink('archive.zip')" > update.php
+          echo "<?php ($$z=new ZipArchive)->open('archive.zip')===TRUE && $$z->extractTo('.') && $$z->close(); unlink('archive.zip'); unlink('update.php') ?>" > update.php
           echo "INTERFACE_EDITOR_URL=https://dev.json.ms" > .env
           echo "ACCESS_CONTROL_ALLOW_ORIGIN=https://dev.json.ms" >> .env
           echo "JSONMS_CYPHER_KEY=${{ secrets.JSONMS_CYPHER_KEY }}" >> .env
