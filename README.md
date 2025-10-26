@@ -13,13 +13,13 @@ Follow these steps to set up and run the project locally:
 
 ### 1. Prepare the MySQL Database
 
-A `.datatable.sql` file is included in the project.  
+A `datatable.sql` file is included in the project.  
 It contains the necessary schema definitions required to run the application.
 
 To set up your database:
 
 ```bash
-mysql -u your_user -p your_database_name < .datatable.sql
+mysql -u your_user -p your_database_name < datatable.sql
 ```
 
 Replace your_user and your_database_name with your MySQL username and target database name.
