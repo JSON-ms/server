@@ -1,4 +1,4 @@
-name: Deploy DEV to host
+name: Deploy PROD to host
 
 on:
   push:
@@ -30,13 +30,13 @@ jobs:
           mkdir .compress
           mv archive.zip .compress/.
           cd .compress
-          echo "<?php ($$z=new ZipArchive)->open('archive.zip')===TRUE && $$z->extractTo('.') && $$z->close(); unlink('archive.zip'); unlink('update.php') ?>" > update.php
-          echo "INTERFACE_EDITOR_URL=https://dev.json.ms" > .env
-          echo "ACCESS_CONTROL_ALLOW_ORIGIN=https://dev.json.ms" >> .env
+          echo "<?php (\$z=new ZipArchive)->open('archive.zip')===TRUE && \$z->extractTo('.') && \$z->close(); unlink('archive.zip'); unlink('update.php') ?>" > update.php
+          echo "INTERFACE_EDITOR_URL=https://json.ms" > .env
+          echo "ACCESS_CONTROL_ALLOW_ORIGIN=https://json.ms" >> .env
           echo "JSONMS_CYPHER_KEY=${{ secrets.JSONMS_CYPHER_KEY }}" >> .env
           echo "GOOGLE_OAUTH_CLIENT_ID=637442439591-qrrpb3v9d3n5m8b8gheorfa1fbi5o6qc.apps.googleusercontent.com" >> .env
           echo "GOOGLE_OAUTH_CLIENT_SECRET=${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}" >> .env
-          echo "GOOGLE_OAUTH_CALLBACK_URL=https://server.dev.json.ms/google/callback" >> .env
+          echo "GOOGLE_OAUTH_CALLBACK_URL=https://server.json.ms/google/callback" >> .env
           echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
           echo "DATABASE_DBNAME=${{ secrets.DATABASE_PROD_DBNAME }}" >> .env
           echo "DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }}" >> .env
