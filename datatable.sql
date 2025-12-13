@@ -75,7 +75,7 @@ DROP TABLE IF EXISTS `permissions`;
 CREATE TABLE `permissions` (
   `id` int NOT NULL AUTO_INCREMENT,
   `structure_uuid` char(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `type` enum('admin','interface') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` enum('admin','structure') COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

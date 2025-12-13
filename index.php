@@ -1,5 +1,7 @@
 <?php
 
+ini_set('session.gc_maxlifetime', 60 * 60 * 24 * 30);
+session_set_cookie_params(60 * 60 * 24 * 30);
 session_start();
 
 error_reporting(E_ALL);
@@ -25,14 +27,6 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Jms-Api-Key, X-Jms-Interface-Hash");
 header("Access-Control-Allow-Credentials: true");
 header('Content-Type: application/json');
-
-setcookie("PHPSESSID", session_id(), [
-    'expires' => time() + 60 * 60 * 24 * 30,
-    'path' => '/',
-    'domain' => '.' . $_SERVER['HTTP_HOST'],
-    'secure' => isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https',
-    'samesite' => 'None'
-]);
 
 // Respond with a 200 OK status for preflight requests
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
