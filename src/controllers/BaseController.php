@@ -90,6 +90,9 @@ abstract class BaseController {
             }
             return null;
         }
+        if ($this->user == null) {
+            return null;
+        }
         return $this->user->id;
     }
 
